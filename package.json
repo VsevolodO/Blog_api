@@ -20,6 +20,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "knex": "^0.95.11",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "underscore": "^1.13.1"
   }
 }

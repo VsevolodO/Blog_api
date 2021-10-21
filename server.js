@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 const _ = require('underscore')
+const bcrypt = require('bcryptjs')
+const salt = bcrypt.genSaltSync(10)
 const knex = require('knex')({
     client: 'pg',
     version: '13',
@@ -37,7 +39,8 @@ app.post('/registration', async (req,res) => {
         }
 
         else { 
-            await knex('User').insert({User:req.query.User, Password:req.query.Password, email:req.query.email})
+            const cryptpass = await bcrypt.hash(req.query.Password, salt)
+            await knex('User').insert({User:req.query.User, Password:cryptpass, email:req.query.email})
             .then(res.status(201).json({message: 'ok'}))
         }
 

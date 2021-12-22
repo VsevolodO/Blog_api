@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const _ = require('underscore')
 const passport = require('passport')
+const multer = require('multer')
 
 const jsonwt = require('jsonwebtoken')
 const key = "test-jwt"
@@ -22,8 +23,11 @@ const knex = require('knex')({
     }
 });
 
-//app.use(passport.initialize())
-//require('./middleware/passport')(passport)
+app.use(passport.initialize())
+require('./middleware/passport')(passport)
+app.use(express.json());
+
+app.use(multer({dest:"uploads", preservePath:true}).single("filedata"));
 
 
 app.post('/registration', async (req,res) => {
@@ -85,6 +89,31 @@ app.post('/auth', async (req,res)=> {
         res.status(409).json({message: 'Не заполнены небходимые поля'})
 
     }
+})
+
+app.post('/blog', passport.authenticate('jwt', {session:false}), async(req, res)=> {
+    
+    console.log(req.body.file)
+
+    if (req.body.Message != undefined){
+        let file = req.body.file
+        
+        await knex('BlogData').insert({User:req.body.User, Message:req.body.Message})
+            .then(res.status(201).json({message: 'ok'}))
+
+    } 
+    else{
+        res.status(201).json({message:'not ok'})
+    }
+
+
+})
+
+app.get('/blog', passport.authenticate('jwt', {session:false}), async(req, res)=> {
+    console.log('get')
+    const result = await knex('BlogData').select('Message').where({User:req.body.User})
+    res.json(result)
+
 })
 
 const port = 9000

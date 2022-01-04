@@ -2,8 +2,8 @@ const express = require('express')
 const app = express()
 const _ = require('underscore')
 const passport = require('passport')
-const multer = require('multer')
-
+//const multer = require('multer')
+const upload =  require('./middleware/f_load')
 const jsonwt = require('jsonwebtoken')
 const key = "test-jwt"
 
@@ -27,8 +27,8 @@ app.use(passport.initialize())
 require('./middleware/passport')(passport)
 app.use(express.json());
 
-app.use(multer({dest:"uploads", preservePath:true}).single("filedata"));
-
+//app.use(multer({dest:"uploads", preservePath:true}).single("filedata"));
+app.use(upload.single('image'))
 
 app.post('/registration', async (req,res) => {
 

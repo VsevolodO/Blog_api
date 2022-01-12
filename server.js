@@ -1,11 +1,14 @@
-const express = require('express')
-const app = express()
-const _ = require('underscore')
-const passport = require('passport')
-//const multer = require('multer')
+const express = require('express');
+const app = express();
+const _ = require('underscore');
+const passport = require('passport');
+const multer = require('multer');
 const upload =  require('./middleware/f_load')
-const jsonwt = require('jsonwebtoken')
+const jsonwt = require('jsonwebtoken');
 const key = "test-jwt"
+
+//const upload = multer({dest: 'uploads'});
+
 
 const bcrypt = require('bcryptjs')
 const salt = bcrypt.genSaltSync(10)
@@ -28,7 +31,7 @@ require('./middleware/passport')(passport)
 app.use(express.json());
 
 //app.use(multer({dest:"uploads", preservePath:true}).single("filedata"));
-app.use(upload.single('image'))
+
 
 app.post('/registration', async (req,res) => {
 
@@ -91,13 +94,12 @@ app.post('/auth', async (req,res)=> {
     }
 })
 
-app.post('/blog', passport.authenticate('jwt', {session:false}), async(req, res)=> {
+app.post('/blog',upload.single('image'), passport.authenticate('jwt', {session:false}), async(req, res)=> {
     
-    console.log(req.body.file)
+    console.log(req.file)
 
     if (req.body.Message != undefined){
-        let file = req.body.file
-        
+    
         await knex('BlogData').insert({User:req.body.User, Message:req.body.Message})
             .then(res.status(201).json({message: 'ok'}))
 

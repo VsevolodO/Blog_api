@@ -5,12 +5,15 @@ const passport = require('passport');
 const multer = require('multer');
 const upload =  require('./middleware/f_load')
 const jsonwt = require('jsonwebtoken');
-const key = "test-jwt"
+const key = "test-jwt";
+const { body, check, validationResult } = require('express-validator');
 
 //const upload = multer({dest: 'uploads'});
 
 
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const req = require('express/lib/request');
+const e = require('express');
 const salt = bcrypt.genSaltSync(10)
 const knex = require('knex')({
     client: 'pg',
@@ -30,7 +33,6 @@ app.use(passport.initialize())
 require('./middleware/passport')(passport)
 app.use(express.json());
 
-//app.use(multer({dest:"uploads", preservePath:true}).single("filedata"));
 
 
 app.post('/registration', async (req,res) => {
@@ -94,9 +96,17 @@ app.post('/auth', async (req,res)=> {
     }
 })
 
-app.post('/blog',upload.single('image'), passport.authenticate('jwt', {session:false}), async(req, res)=> {
+
+
+
+app.post('/blog',check('Message').notEmpty().withMessage('empt'), passport.authenticate('jwt', {session:false}), upload.single('image'), async(req, res)=> {
     
-    console.log(req.file)
+    console.log(req.body.Message)
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()){
+        console.log(errors)
+    }
 
     if (req.body.Message != undefined){
     

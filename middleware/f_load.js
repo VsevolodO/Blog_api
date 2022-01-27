@@ -2,7 +2,7 @@ const multer = require('multer')
 const moment = require('moment')
 
 const fileFilter =(req, file, cb) => {
-    if(file.mimetype === 'image/jpeg') {
+    if(file.mimetype === 'image/jpeg' ) {
         cb(null,true)
     }
     else{

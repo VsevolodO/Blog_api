@@ -7,6 +7,7 @@ const upload =  require('./middleware/f_load')
 const jsonwt = require('jsonwebtoken');
 const key = "test-jwt";
 const { body, check, validationResult } = require('express-validator');
+const bodyparser = require('body-parser')
 
 //const upload = multer({dest: 'uploads'});
 
@@ -99,9 +100,9 @@ app.post('/auth', async (req,res)=> {
 
 
 
-app.post('/blog',check('Message').notEmpty().withMessage('empt'), passport.authenticate('jwt', {session:false}), upload.single('image'), async(req, res)=> {
+app.post('/blog',body("Message").notEmpty().withMessage('empt'), passport.authenticate('jwt', {session:false}), upload.single('image'), async(req, res)=> {
     
-    console.log(req.body.Message)
+    //console.log(req.body.Message)
     const errors = validationResult(req)
 
     if (!errors.isEmpty()){
@@ -127,6 +128,19 @@ app.get('/blog', passport.authenticate('jwt', {session:false}), async(req, res)=
     res.json(result)
 
 })
+
+app.post('/test', check('test').isLength({min:2}),(req,res)=>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        res.send(errors)
+        console.log(errors)
+    }
+    else{
+        console.log('ok')
+    }
+}, upload.single('image') );
+
+
 
 const port = 9000
 app.listen(port,()=>{

@@ -2,19 +2,20 @@ const express = require('express');
 const app = express();
 const _ = require('underscore');
 const passport = require('passport');
-const multer = require('multer');
+
 const upload =  require('./middleware/f_load')
 const jsonwt = require('jsonwebtoken');
 const key = "test-jwt";
 const { body, check, validationResult } = require('express-validator');
-const bodyparser = require('body-parser')
 
-//const upload = multer({dest: 'uploads'});
+const fs = require('fs');
+
 
 
 const bcrypt = require('bcryptjs');
 const req = require('express/lib/request');
 const e = require('express');
+
 const salt = bcrypt.genSaltSync(10)
 const knex = require('knex')({
     client: 'pg',
@@ -33,6 +34,21 @@ const knex = require('knex')({
 app.use(passport.initialize())
 require('./middleware/passport')(passport)
 app.use(express.json());
+
+
+
+const validator =  function(req, res, next){
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        res.send(errors);
+        //console.log(errors);
+        fs.unlinkSync(req.file.path);
+    }
+    else{
+        next()
+    }
+};
+
 
 
 
@@ -100,25 +116,9 @@ app.post('/auth', async (req,res)=> {
 
 
 
-app.post('/blog',body("Message").notEmpty().withMessage('empt'), passport.authenticate('jwt', {session:false}), upload.single('image'), async(req, res)=> {
-    
-    //console.log(req.body.Message)
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()){
-        console.log(errors)
-    }
-
-    if (req.body.Message != undefined){
-    
-        await knex('BlogData').insert({User:req.body.User, Message:req.body.Message})
-            .then(res.status(201).json({message: 'ok'}))
-
-    } 
-    else{
-        res.status(201).json({message:'not ok'})
-    }
-
+app.post('/blog',upload.single('image'),body("Message").notEmpty(),validator, passport.authenticate('jwt', {session:false}),  async(req, res)=> {
+    await knex('BlogData').insert({User:req.body.User, Message:req.body.Message})
+    .then(res.status(201).json({message: 'ok'}))
 
 })
 
@@ -129,16 +129,6 @@ app.get('/blog', passport.authenticate('jwt', {session:false}), async(req, res)=
 
 })
 
-app.post('/test', check('test').isLength({min:2}),(req,res)=>{
-    const errors = validationResult(req);
-    if (!errors.isEmpty()){
-        res.send(errors)
-        console.log(errors)
-    }
-    else{
-        console.log('ok')
-    }
-}, upload.single('image') );
 
 
 

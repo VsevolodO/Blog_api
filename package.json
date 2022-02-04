@@ -19,6 +19,7 @@
   "homepage": "https://github.com/VsevolodO/Blog_api#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.1",
     "express": "^4.17.1",
     "express-validator": "^6.14.0",
     "jsonwebtoken": "^8.5.1",

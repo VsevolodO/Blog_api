@@ -13,8 +13,7 @@ const fs = require('fs');
 
 
 const bcrypt = require('bcryptjs');
-const req = require('express/lib/request');
-const e = require('express');
+
 
 const salt = bcrypt.genSaltSync(10)
 const knex = require('knex')({

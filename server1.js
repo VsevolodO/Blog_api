@@ -5,6 +5,9 @@ const blogRouter = require('./routes/blog')
 
 const app = express()
 const passport = require('passport')
+const bodyparser =  require('body-parser')
+
+app.use(bodyparser.json())
 
 
 

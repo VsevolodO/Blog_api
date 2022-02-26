@@ -10,8 +10,6 @@ const { body, check, validationResult } = require('express-validator');
 
 const fs = require('fs');
 
-
-
 const bcrypt = require('bcryptjs');
 
 

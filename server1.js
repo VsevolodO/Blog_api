@@ -11,6 +11,10 @@ app.use(bodyparser.json())
 
 
 
+app.use(passport.initialize())
+require('./middleware/passport')(passport)
+
+
 app.use('/auth',authRouter)
 app.use('/blog',blogRouter)
 

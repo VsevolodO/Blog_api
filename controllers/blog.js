@@ -15,14 +15,14 @@ const knex = require('knex')({
 
 
 module.exports.add =  async function(req, res) {
-    console.log(req.body)
+  
     await knex('BlogData').insert({User:req.body.User, Message:req.body.Message})
     .then(res.status(201).json({message: 'ok'}))
 
 }
 
 module.exports.get=  async function(req, res) {
-  console.log('get')
+  
   const result = await knex('BlogData').select('Message').where({User:req.body.User})
 
   res.json(result)

@@ -1,15 +1,31 @@
 
 const express = require('express')
-const app = express();
+
 const router = express.Router()
 const controller = require('../controllers/blog')
 const passport = require('passport');
-app.use(passport.initialize())
+const { body, check, validationResult } = require('express-validator');
+const upload =  require('../middleware/f_load')
+
+
+const validator =  function(req, res, next){
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        res.send(errors);
+        //console.log(errors);
+        fs.unlinkSync(req.file.path);
+    }
+    else{
+        next()
+    }
+};
+
 
 
 require('../middleware/passport')(passport)
 
-router.post('/add', controller.add)
+
 // router.get('/get',controller.get_posts)
-router.get('/get',controller.get, passport.authenticate('jwt', {session:false}))
+router.get('/get', passport.authenticate('jwt', {session:false}),controller.get),
+router.post('/add',upload.single('image'), body("Message").notEmpty(),validator, passport.authenticate('jwt', {session:false}),controller.add)
 module.exports = router

@@ -12,7 +12,8 @@ const knex = require('knex')({
     }
 });
 
-
+const { attachPaginate } = require('knex-paginate');
+attachPaginate();
 
 module.exports.add =  async function(req, res) {
   
@@ -23,7 +24,7 @@ module.exports.add =  async function(req, res) {
 
 module.exports.get=  async function(req, res) {
   
-  const result = await knex('BlogData').select('Message').where({User:req.body.User})
+  const result = await knex('BlogData').select('Message').where({User:req.body.User}).paginate({perPage:10})
 
   res.json(result)
 

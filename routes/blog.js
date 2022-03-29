@@ -6,7 +6,7 @@ const controller = require('../controllers/blog')
 const passport = require('passport');
 const { body, check, validationResult } = require('express-validator');
 const upload =  require('../middleware/f_load')
-
+const knex = require('knex')
 
 const validator =  function(req, res, next){
     const errors = validationResult(req);
@@ -19,7 +19,6 @@ const validator =  function(req, res, next){
         next()
     }
 };
-
 
 
 require('../middleware/passport')(passport)

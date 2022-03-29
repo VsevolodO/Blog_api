@@ -17,15 +17,18 @@ attachPaginate();
 
 module.exports.add =  async function(req, res) {
   
-    await knex('BlogData').insert({User:req.body.User, Message:req.body.Message})
+    await knex('BlogData').insert({User:req.body.User, Message:req.body.Message, filepath:req.file.path})
     .then(res.status(201).json({message: 'ok'}))
 
 }
 
 module.exports.get=  async function(req, res) {
-  
-  const result = await knex('BlogData').select('Message').where({User:req.body.User}).paginate({perPage:10})
 
+  const result = await knex('BlogData').select('Message','filepath').where({User:req.body.User}).paginate({perPage:10})
+  
   res.json(result)
+ 
+  
 
 }
+

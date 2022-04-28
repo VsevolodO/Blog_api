@@ -27,4 +27,6 @@ require('../middleware/passport')(passport)
 // router.get('/get',controller.get_posts)
 router.get('/get', passport.authenticate('jwt', {session:false}),controller.get),
 router.post('/add',upload.single('image'), body("Message").notEmpty(),validator, passport.authenticate('jwt', {session:false}),controller.add)
+router.delete('/del', body("Message").notEmpty(), passport.authenticate('jwt', {session:false}),controller.del)
+router.patch('/path', body("Message").notEmpty(), passport.authenticate('jwt', {session:false}),controller.upd)
 module.exports = router

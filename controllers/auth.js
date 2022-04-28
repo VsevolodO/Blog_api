@@ -1,13 +1,14 @@
+require('dotenv').config()
 
 const knex = require('knex')({
     client: 'pg',
     version: '13',
     connection: {
       host : '127.0.0.1',
-      port:'5432',
-      user : 'postgres',
-      password : 'admin',
-      database : 'Blog',
+      port:process.env.DB_PORT,
+      user : process.env.DB_USER,
+      password : process.env.DB_PASS,
+      database : process.env.DB,
       timezone: 'UTC',
       dateStrings: true,
     }
@@ -21,10 +22,10 @@ const key = "test-jwt";
 
 module.exports.regist = async function(req,res) {
     
-    if (req.query.email && req.query.User && req.query.Password != undefined){
+    if (req.body.email && req.body.user && req.body.password != undefined){
 
-        const SameUsername = await knex.select('User').table('User').where('User',req.query.User)
-        const SameEmail = await knex.select('User').table('User').where('email',req.query.email)
+        const SameUsername = await knex.select('User').table('User').where('User',req.body.user)
+        const SameEmail = await knex.select('User').table('User').where('email',req.body.email)
         
 
         if(_.isEmpty(SameUsername) == false && _.isEmpty(SameEmail) == false){
@@ -40,8 +41,8 @@ module.exports.regist = async function(req,res) {
         }
 
         else { 
-            const cryptpass = await bcrypt.hash(req.query.Password, salt)
-            await knex('User').insert({User:req.query.User, Password:cryptpass, email:req.query.email})
+            const cryptpass = await bcrypt.hash(req.body.password, salt)
+            await knex('User').insert({User:req.body.user, Password:cryptpass, email:req.body.email})
             .then(res.status(201).json({message: 'ok'}))
         }
 
@@ -52,12 +53,14 @@ module.exports.regist = async function(req,res) {
 };
 
 module.exports.login = async function(req,res) {
-    if (req.query.Password && req.query.User != undefined){
-        const ExistUsername = await knex.select('*').table('User').where('User',req.query.User)
+    
+    if (req.body.password && req.body.user != undefined){
+        const ExistUsername = await knex.select('*').table('User').where('User',req.body.user)
 
         if(_.isEmpty(ExistUsername) == false){
             
-            const passwordResult = bcrypt.compareSync(req.query.Password, ExistUsername[0].Password)
+            const passwordResult = bcrypt.compareSync(req.body.password, ExistUsername[0].Password)
+            
             if(passwordResult){
                 const token = jsonwt.sign({
                     email: ExistUsername[0].email,
@@ -67,9 +70,12 @@ module.exports.login = async function(req,res) {
                 res.status(200).json({token: `Bearer ${token}`})
             }
             else{
-                res.json({status:'not ok'})
+                res.status(401).json({message: 'Пароль не верен'})
             }
 
+        }
+        else{
+            res.status(401).json({message: 'Пользователь не найден'})
         }
         
     } else{
